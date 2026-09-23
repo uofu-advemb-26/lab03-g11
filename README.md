@@ -1,4 +1,3 @@
-# RTOS 00
+# RTOS 03
 
-[![Build firmware](https://github.com/ZainKergayeProjects/rtos.00/actions/workflows/build.yml/badge.svg)](https://github.com/ZainKergayeProjects/rtos.00/actions/workflows/build.yml)
-[![Unit Tests](https://github.com/ZainKergayeProjects/rtos.00/actions/workflows/test.yml/badge.svg)](https://github.com/ZainKergayeProjects/rtos.00/actions/workflows/test.yml)
+This is lab 3, refer [here](https://github.com/uofu-embed/rtos/tree/main/labs/03.threads) for the manual.
