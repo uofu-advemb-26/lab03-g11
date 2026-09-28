@@ -19,16 +19,15 @@ int on;
 
 void side_thread(void *params) {
   while (1) {
-    vTaskDelay(100);
-    counter += 1;
-    printf("hello world from %s! Count %d\n", "thread", counter);
+    vTaskDelay(1000);
+    printf("hello world from %s! Count %d\n", "thread", counter++);
   }
 }
 
 void main_thread(void *params) {
   while (1) {
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-    vTaskDelay(100);
+    vTaskDelay(1000);
     printf("hello world from %s! Count %d\n", "main", counter++);
     on = !on;
   }
