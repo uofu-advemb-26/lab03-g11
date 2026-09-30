@@ -13,3 +13,8 @@ We just created a semaphor and then didn't do anything with it.
 Side thread will print first, then main second.
 
 After running main code, side_thread prints out first, then main_thread second. Our predictions were true.
+
+## Activity 1
+
+1. count is being used in both threads and is not being locked.
+1. I don't think so
