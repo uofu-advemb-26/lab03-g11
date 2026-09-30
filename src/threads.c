@@ -1,3 +1,4 @@
+#include "print_lib.h"
 #include <FreeRTOS.h>
 #include <pico/cyw43_arch.h>
 #include <pico/multicore.h>
@@ -23,7 +24,7 @@ void side_thread(void *params) {
 
     xSemaphoreTake(semaphore, portMAX_DELAY);
     counter += 1;
-    printf("hello world from %s! Count %d\n", "thread", counter);
+    print_status("thread", &counter);
     xSemaphoreGive(semaphore);
   }
 }
@@ -34,7 +35,7 @@ void main_thread(void *params) {
     vTaskDelay(1000);
     xSemaphoreTake(semaphore, portMAX_DELAY);
     counter += 1;
-    printf("hello world from %s! Count %d\n", "main", counter);
+    print_status("main", &counter);
     xSemaphoreGive(semaphore);
     on = !on;
   }
