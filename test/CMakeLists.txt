@@ -1,4 +1,4 @@
-add_executable(mytest test.c unity_config.c)
+add_executable(mytest test.c unity_config.c ${CMAKE_SOURCE_DIR}/src/print_lib.c)
 
 add_library(unity ${UNITY_PATH}/src/unity.c)
 target_include_directories(unity PUBLIC ${UNITY_PATH}/src)
@@ -14,8 +14,8 @@ endif()
 
 # Modify the below lines to enable/disable output over UART/USB. These are
 # mutually exclusive, only set one.
-pico_enable_stdio_uart(mytest 0)
-pico_enable_stdio_usb(mytest 1)
+pico_enable_stdio_uart(mytest 1)
+pico_enable_stdio_usb(mytest 0)
 
 # This will speed up the simulation, since data won't be copied from the flash
 # controller. It does make the binary non-persistent on a real microcontroller.

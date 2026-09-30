@@ -3,6 +3,6 @@
 
 #include "print_lib.h"
 
-void print_status(const char *str, int *cnt) {
-  printf("hello world from %s! Count %d\n", str, *cnt);
+int print_status(const char *str, int *cnt) {
+  return printf("hello world from %s! Count %d\n", str, *cnt);
 }
