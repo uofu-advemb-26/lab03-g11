@@ -1,6 +1,4 @@
-#include "print_lib.h"
 #include <FreeRTOS.h>
-#include <pico/cyw43_arch.h>
 #include <pico/multicore.h>
 #include <pico/stdlib.h>
 #include <semphr.h>
@@ -16,39 +14,47 @@
 SemaphoreHandle_t semaphoreA;
 SemaphoreHandle_t semaphoreB;
 
-
+struct paramSet {
+  SemaphoreHandle_t semaphoreA;
+  SemaphoreHandle_t semaphoreB;
+};
 
 // game plan!!!
 // xtaskcreate
 
 void side_thread(void *params) {
+  struct paramSet a = (*(struct paramSet *)params);
   while (1) {
-    xSemaphoreTake(semaphoreA, portMAX_DELAY);
+    xSemaphoreTake(a.semaphoreA, portMAX_DELAY);
+    printf("Trying to take the other thread");
     // request other
-    xSemaphoreTake(semaphoreB, portMAX_DELAY);
+    xSemaphoreTake(a.semaphoreB, portMAX_DELAY);
+    printf("Taken other thread finally!!! (side thread)");
   }
 }
 
 void main_thread(void *params) {
+  struct paramSet a = (*(struct paramSet *)params);
   while (1) {
-    xSemaphoreTake(semaphoreB, portMAX_DELAY);
+    xSemaphoreTake(a.semaphoreB, portMAX_DELAY);
+    printf("Trying to take the other thread");
     // request other
-    xSemaphoreTake(semaphoreA, portMAX_DELAY);
-
+    xSemaphoreTake(a.semaphoreA, portMAX_DELAY);
+    printf("Taken other thread finally!!! (main thread)");
   }
 }
 
-int main(void) {
-  stdio_init_all();
-  TaskHandle_t main, side;
-  semaphoreA = xSemaphoreCreateMutex();
-  semaphoreB = xSemaphoreCreateMutex();
-  xTaskCreate(main_thread, "MainThread", MAIN_TASK_STACK_SIZE, NULL,
-              MAIN_TASK_PRIORITY, &main);
-  xTaskCreate(side_thread, "SideThread", SIDE_TASK_STACK_SIZE, NULL,
-              SIDE_TASK_PRIORITY, &side);
-
-              
-  vTaskStartScheduler();
-  return 0;
-}
+// int main(void) {
+//   stdio_init_all();
+//   TaskHandle_t main, side;
+//   semaphoreA = xSemaphoreCreateMutex();
+//   semaphoreB = xSemaphoreCreateMutex();
+//   struct paramSet dfsdsfs = {semaphoreA, semaphoreB};
+//   xTaskCreate(main_thread, "MainThread", MAIN_TASK_STACK_SIZE, &dfsdsfs,
+//               MAIN_TASK_PRIORITY, &main);
+//   xTaskCreate(side_thread, "SideThread", SIDE_TASK_STACK_SIZE, &dfsdsfs,
+//               SIDE_TASK_PRIORITY, &side);
+//
+//   vTaskStartScheduler();
+//   return 0;
+// }
