@@ -13,50 +13,42 @@
 #define SIDE_TASK_PRIORITY (tskIDLE_PRIORITY + 1UL)
 #define SIDE_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
-SemaphoreHandle_t semaphore;
+SemaphoreHandle_t semaphoreA;
+SemaphoreHandle_t semaphoreB;
 
-int counter;
-int on;
+
 
 // game plan!!!
 // xtaskcreate
 
 void side_thread(void *params) {
   while (1) {
-    vTaskDelay(1000);
-
-    xSemaphoreTake(semaphore, portMAX_DELAY);
-    counter += 1;
-    print_status("thread", &counter);
-    xSemaphoreGive(semaphore);
+    xSemaphoreTake(semaphoreA, portMAX_DELAY);
+    // request other
+    xSemaphoreTake(semaphoreB, portMAX_DELAY);
   }
 }
 
 void main_thread(void *params) {
   while (1) {
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
-    vTaskDelay(1000);
-    xSemaphoreTake(semaphore, portMAX_DELAY);
-    counter += 1;
-    print_status("main", &counter);
-    xSemaphoreGive(semaphore);
-    on = !on;
+    xSemaphoreTake(semaphoreB, portMAX_DELAY);
+    // request other
+    xSemaphoreTake(semaphoreA, portMAX_DELAY);
+
   }
 }
 
 int main(void) {
   stdio_init_all();
-  hard_assert(cyw43_arch_init() == PICO_OK);
-  on = false;
-  counter = 0;
   TaskHandle_t main, side;
-  semaphore = xSemaphoreCreateCounting(1, 1);
+  semaphoreA = xSemaphoreCreateMutex();
+  semaphoreB = xSemaphoreCreateMutex();
   xTaskCreate(main_thread, "MainThread", MAIN_TASK_STACK_SIZE, NULL,
               MAIN_TASK_PRIORITY, &main);
   xTaskCreate(side_thread, "SideThread", SIDE_TASK_STACK_SIZE, NULL,
               SIDE_TASK_PRIORITY, &side);
-  vTaskSuspend(main);
-  vTaskDelete(main);
+
+              
   vTaskStartScheduler();
   return 0;
 }

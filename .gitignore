@@ -2,3 +2,4 @@ result
 build
 .direnv
 .cache
+lib/
