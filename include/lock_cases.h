@@ -10,6 +10,7 @@ void main_thread(void *params);
 struct paramSet {
   SemaphoreHandle_t semaphoreA;
   SemaphoreHandle_t semaphoreB;
+  int *count;
 };
 
 #endif

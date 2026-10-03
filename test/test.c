@@ -54,25 +54,47 @@ void test_multiplication(void) {
 }
 
 void test_lock_cases() {
+  int count = 0;
   SemaphoreHandle_t semaphoreA;
   SemaphoreHandle_t semaphoreB;
   // Suspend both
   TaskHandle_t main, side;
   semaphoreA = xSemaphoreCreateMutex();
   semaphoreB = xSemaphoreCreateMutex();
-  struct paramSet dfsdsfs = {semaphoreA, semaphoreB};
+  struct paramSet dfsdsfs = {semaphoreA, semaphoreB, &count};
   xTaskCreate(main_thread, "MainThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-              (tskIDLE_PRIORITY + 1UL), &main);
+                (tskIDLE_PRIORITY + 1UL), &main);
   xTaskCreate(side_thread, "SideThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-              (tskIDLE_PRIORITY + 1UL), &side);
+                (tskIDLE_PRIORITY + 1UL), &side);
 
   vTaskStartScheduler();
   // Check
-
+  TEST_ASSERT_TRUE_MESSAGE(count == 0, "Neither thread A nor B should increment the count");
   vTaskDelete(main);
 
-  // TEST_ASSERT_TRUE_MESSAGE(x == 1, "Variable assignment failed.");
 }
+
+// void test_lock_cases_no_lock() {
+//   SemaphoreHandle_t semaphoreA;
+//   SemaphoreHandle_t semaphoreB;
+//   // Suspend both
+//   TaskHandle_t main, side;
+//   semaphoreA = xSemaphoreCreateMutex();
+//   semaphoreB = xSemaphoreCreateMutex();
+//   struct paramSet dfsdsfs = {semaphoreA, semaphoreB};
+  
+//   xTaskCreate(main_thread, "MainThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
+//               (tskIDLE_PRIORITY + 1UL), &main);
+//   xTaskCreate(side_thread, "SideThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
+//               (tskIDLE_PRIORITY + 1UL), &side);
+
+//   vTaskStartScheduler();
+//   // Check
+
+//   vTaskDelete(main);
+
+
+// }
 
 int main(void) {
   stdio_init_all();

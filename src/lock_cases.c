@@ -17,8 +17,9 @@ SemaphoreHandle_t semaphoreB;
 struct paramSet {
   SemaphoreHandle_t semaphoreA;
   SemaphoreHandle_t semaphoreB;
+  int *count;
 };
-
+int count;
 // game plan!!!
 // xtaskcreate
 
@@ -30,6 +31,7 @@ void side_thread(void *params) {
     // request other
     xSemaphoreTake(a.semaphoreB, portMAX_DELAY);
     printf("Taken other thread finally!!! (side thread)");
+    a.count += 1;
   }
 }
 
@@ -41,6 +43,7 @@ void main_thread(void *params) {
     // request other
     xSemaphoreTake(a.semaphoreA, portMAX_DELAY);
     printf("Taken other thread finally!!! (main thread)");
+    a.count += 1;
   }
 }
 
