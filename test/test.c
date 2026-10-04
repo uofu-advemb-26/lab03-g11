@@ -61,40 +61,19 @@ void test_lock_cases() {
   TaskHandle_t main, side;
   semaphoreA = xSemaphoreCreateMutex();
   semaphoreB = xSemaphoreCreateMutex();
-  struct paramSet dfsdsfs = {semaphoreA, semaphoreB, &count};
-  xTaskCreate(main_thread, "MainThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-                (tskIDLE_PRIORITY + 1UL), &main);
-  xTaskCreate(side_thread, "SideThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-                (tskIDLE_PRIORITY + 1UL), &side);
+  struct paramSet semSet = {semaphoreA, semaphoreB, &count};
+  xTaskCreate(main_thread, "MainThread", configMINIMAL_STACK_SIZE, &semSet,
+              (tskIDLE_PRIORITY + 1UL), &main);
+  xTaskCreate(side_thread, "SideThread", configMINIMAL_STACK_SIZE, &semSet,
+              (tskIDLE_PRIORITY + 1UL), &side);
 
   vTaskStartScheduler();
   // Check
-  TEST_ASSERT_TRUE_MESSAGE(count == 0, "Neither thread A nor B should increment the count");
+  TEST_ASSERT_TRUE_MESSAGE(count == 0,
+                           "Neither thread A nor B should increment the count");
   vTaskDelete(main);
-
+  vTaskDelete(side);
 }
-
-// void test_lock_cases_no_lock() {
-//   SemaphoreHandle_t semaphoreA;
-//   SemaphoreHandle_t semaphoreB;
-//   // Suspend both
-//   TaskHandle_t main, side;
-//   semaphoreA = xSemaphoreCreateMutex();
-//   semaphoreB = xSemaphoreCreateMutex();
-//   struct paramSet dfsdsfs = {semaphoreA, semaphoreB};
-  
-//   xTaskCreate(main_thread, "MainThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-//               (tskIDLE_PRIORITY + 1UL), &main);
-//   xTaskCreate(side_thread, "SideThread", configMINIMAL_STACK_SIZE, &dfsdsfs,
-//               (tskIDLE_PRIORITY + 1UL), &side);
-
-//   vTaskStartScheduler();
-//   // Check
-
-//   vTaskDelete(main);
-
-
-// }
 
 int main(void) {
   stdio_init_all();
