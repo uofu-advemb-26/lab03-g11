@@ -1,4 +1,5 @@
 #include "lock_cases.h"
+#include "orphan.h"
 #include "print_lib.h"
 #include "unity_config.h"
 #include <FreeRTOS.h>
@@ -75,19 +76,53 @@ void test_lock_cases() {
   vTaskDelete(side);
 }
 
+void test_orphaned_lock() {
+  int counter = 0;
+  int leftLoop = 0;
+  SemaphoreHandle_t sem = xSemaphoreCreateMutex();
+  TaskHandle_t orphan;
+  struct lock_param_set set = {sem, counter, leftLoop};
+  xTaskCreate(orphaned_lock, "OrphanedLock", configMINIMAL_STACK_SIZE, &set,
+              (tskIDLE_PRIORITY + 1UL), &orphan);
+  vTaskDelay(1);
+  BaseType_t taken = xSemaphoreTake(sem, (TickType_t)10);
+  TEST_ASSERT_TRUE_MESSAGE(taken == pdFALSE, "The lock has not deadlocked.");
+  vTaskDelete(orphan);
+  vSemaphoreDelete(sem);
+}
+
+void test_non_orphaned_lock() {
+  int counter = 0;
+  int leftLoop = 0;
+  SemaphoreHandle_t sem = xSemaphoreCreateMutex();
+  TaskHandle_t non_orphan;
+  struct lock_param_set set = {sem, counter, leftLoop};
+  xTaskCreate(non_orphaned_lock, "NonOrphanedLock", configMINIMAL_STACK_SIZE,
+              &set, (tskIDLE_PRIORITY + 1UL), &non_orphan);
+  vTaskDelay(1);
+  BaseType_t taken = xSemaphoreTake(sem, (TickType_t)10);
+  TEST_ASSERT_TRUE_MESSAGE(taken == pdTRUE, "The lock has deadlocked.");
+  xSemaphoreGive(sem);
+  vTaskDelete(non_orphan);
+  vSemaphoreDelete(sem);
+}
+
+void test_runner(void *params) {
+  UNITY_BEGIN();
+  RUN_TEST(test_variable_assignment);
+  RUN_TEST(test_multiplication);
+  RUN_TEST(test_print_returns);
+  RUN_TEST(test_semaphore_take);
+  RUN_TEST(test_semaphore_take_fail);
+  RUN_TEST(test_orphaned_lock);
+  RUN_TEST(test_non_orphaned_lock);
+  UNITY_END();
+  vTaskDelete(NULL);
+}
+
 int main(void) {
   stdio_init_all();
-  printf("Welcome to the amazing testing suite! Do not cry too much!");
-  while (true) {
-    printf("Start tests\n");
-    UNITY_BEGIN();
-    RUN_TEST(test_variable_assignment);
-    RUN_TEST(test_multiplication);
-    RUN_TEST(test_print_returns);
-    RUN_TEST(test_semaphore_take);
-    RUN_TEST(test_semaphore_take_fail);
-    // RUN_TEST(test_lock_cases);
-    sleep_ms(5000);
-    UNITY_END();
-  }
+  xTaskCreate(test_runner, "TestRunner", configMINIMAL_STACK_SIZE, NULL,
+              (tskIDLE_PRIORITY + 1UL), NULL);
+  vTaskStartScheduler();
 }
