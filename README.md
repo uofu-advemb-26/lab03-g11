@@ -1,5 +1,7 @@
 # RTOS 03
 
+[![Pico tests](https://github.com/uofu-advemb-26/lab03-g11/actions/workflows/pico-tests.yml/badge.svg)](https://github.com/uofu-advemb-26/lab03-g11/actions/workflows/pico-tests.yml)
+
 This is lab 3, refer [here](https://github.com/uofu-embed/rtos/tree/main/labs/03.threads) for the manual.
 
 ## Activity 0
